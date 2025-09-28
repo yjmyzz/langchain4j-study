@@ -76,6 +76,21 @@
             color: #666;
             font-style: italic;
         }
+        .api-key-group {
+            margin-bottom: 15px;
+        }
+        .api-key-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .api-key-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +101,11 @@
             <div class="message ai-message">
                 <strong>AI助手:</strong> 你好！我是基于LongChain4j和DeepSeek大模型的AI助手，有什么可以帮助您的吗？
             </div>
+        </div>
+        
+        <div class="api-key-group">
+            <label for="apiKeyInput">API密钥:</label>
+            <input type="password" id="apiKeyInput" placeholder="请输入您的DeepSeek API密钥..." style="width: 100%; margin-bottom: 10px;">
         </div>
         
         <div class="input-group">
@@ -119,8 +139,15 @@
 
         async function sendMessage() {
             const input = document.getElementById('messageInput');
+            const apiKeyInput = document.getElementById('apiKeyInput');
             const message = input.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            
             if (!message) return;
+            if (!apiKey) {
+                setStatus('请先输入API密钥');
+                return;
+            }
 
             const sendBtn = document.getElementById('sendBtn');
             const streamBtn = document.getElementById('streamBtn');
@@ -133,7 +160,8 @@
             input.value = '';
 
             try {
-                const response = await fetch(`/api/chat?prompt=${encodeURIComponent(message)}`);
+                const url = `/api/chat?prompt=${encodeURIComponent(message)}&apiKey=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(url);
                 const aiResponse = await response.text();
                 addMessage(aiResponse);
                 setStatus('消息发送成功');
@@ -148,8 +176,15 @@
 
         async function sendStreamMessage() {
             const input = document.getElementById('messageInput');
+            const apiKeyInput = document.getElementById('apiKeyInput');
             const message = input.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            
             if (!message) return;
+            if (!apiKey) {
+                setStatus('请先输入API密钥');
+                return;
+            }
 
             const sendBtn = document.getElementById('sendBtn');
             const streamBtn = document.getElementById('streamBtn');
@@ -172,7 +207,8 @@
             const streamingContent = document.getElementById('streamingContent');
 
             try {
-                const response = await fetch(`/api/chat/stream?prompt=${encodeURIComponent(message)}`);
+                const url = `/api/chat/stream?prompt=${encodeURIComponent(message)}&apiKey=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(url);
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
 
