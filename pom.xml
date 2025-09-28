@@ -15,7 +15,7 @@
     <artifactId>longchain4j-study</artifactId>
     <version>1.0.0</version>
     <name>longchain4j-study</name>
-    <description>LongChain4j学习项目 - 集成Ollama聊天示例 by 菩提树下的杨过</description>
+    <description>LongChain4j学习项目 - 集成DeepSeek大模型聊天示例 by 菩提树下的杨过</description>
 
     <properties>
         <java.version>21</java.version>
@@ -48,11 +48,11 @@
             <version>${longchain4j.version}</version>
         </dependency>
 
-        <!-- LongChain4j Ollama Integration -->
+        <!-- LongChain4j OpenAI Integration (支持DeepSeek) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-ollama</artifactId>
-            <version>1.1.0-rc1</version>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${longchain4j.version}</version>
         </dependency>
 
         <!-- Spring Boot Test -->

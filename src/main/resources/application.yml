@@ -15,15 +15,18 @@ spring:
     pattern:
       console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Ollama配置
-ollama:
-  base-url: http://localhost:11434
-  model: qwen3:0.6b
+# DeepSeek配置
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:your-deepseek-api-key-here}
+  base-url: https://api.deepseek.com
+  model: deepseek-chat
   timeout: 60
+  temperature: 0.7
+  max-tokens: 2048
 
 # 应用信息
 info:
   app:
     name: LongChain4j Study
     version: 1.0.0
-    description: LongChain4j学习项目 - 集成Ollama聊天示例 
+    description: LongChain4j学习项目 - 集成DeepSeek大模型聊天示例 

@@ -15,7 +15,7 @@ import reactor.core.publisher.Sinks;
 
 /**
  * 聊天控制器
- * 提供与Ollama模型交互的REST API
+ * 提供与DeepSeek大模型交互的REST API
  *
  * @author 菩提树下的杨过
  * @version 1.0.0
@@ -48,7 +48,7 @@ public class ChatController {
             return ResponseEntity.ok(aiResponse);
 
         } catch (Exception e) {
-            log.error("与Ollama通信时发生错误", e);
+            log.error("与DeepSeek通信时发生错误", e);
             String errorResponse = "抱歉，处理您的请求时发生了错误: " + e.getMessage();
             return ResponseEntity.ok(errorResponse);
         }
