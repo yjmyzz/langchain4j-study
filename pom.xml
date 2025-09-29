@@ -55,6 +55,13 @@
             <version>1.1.0-rc1</version>
         </dependency>
 
+        <!-- LongChain4j OpenAI Integration (支持DeepSeek) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${longchain4j.version}</version>
+        </dependency>
+
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

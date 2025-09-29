@@ -34,7 +34,7 @@ public class OllamaConfig {
      *
      * @return ChatLanguageModel实例
      */
-    @Bean
+    @Bean("ollamaChatModel")
     public ChatModel chatModel() {
         return OllamaChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
@@ -45,7 +45,7 @@ public class OllamaConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("ollamaStreamingChatModel")
     public StreamingChatModel streamingChatModel() {
         return OllamaStreamingChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
@@ -55,4 +55,5 @@ public class OllamaConfig {
                 .logResponses(true)
                 .build();
     }
+
 } 

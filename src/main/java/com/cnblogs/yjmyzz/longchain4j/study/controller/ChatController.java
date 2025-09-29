@@ -7,6 +7,7 @@ import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,11 @@ import reactor.core.publisher.Sinks;
 public class ChatController {
 
     @Autowired
+    @Qualifier("ollamaChatModel")
     private ChatModel chatModel;
 
     @Autowired
+    @Qualifier("ollamaStreamingChatModel")
     private StreamingChatModel streamingChatModel;
 
     /**
@@ -69,7 +72,7 @@ public class ChatController {
         streamingChatModel.chat(prompt, new StreamingChatResponseHandler() {
             @Override
             public void onPartialResponse(String s) {
-                log.info("收到部分响应: {}",s);
+                log.info("收到部分响应: {}", s);
                 // 发送SSE格式的数据
                 sink.tryEmitNext(escapeToHtml(s));
             }
