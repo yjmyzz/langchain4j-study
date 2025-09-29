@@ -1,6 +1,6 @@
 package com.cnblogs.yjmyzz.longchain4j.study.controller;
 
-import com.cnblogs.tools.OrderTools;
+import com.cnblogs.yjmyzz.longchain4j.study.tools.OrderTools;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.agent.tool.ToolSpecifications;
 import dev.langchain4j.data.message.AiMessage;

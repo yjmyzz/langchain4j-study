@@ -1,4 +1,4 @@
-package com.cnblogs.tools;
+package com.cnblogs.yjmyzz.longchain4j.study.tools;
 
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;

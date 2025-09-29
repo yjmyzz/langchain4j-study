@@ -1,6 +1,6 @@
 package com.cnblogs.yjmyzz.longchain4j.study.config;
 
-import com.cnblogs.tools.OrderTools;
+import com.cnblogs.yjmyzz.longchain4j.study.tools.OrderTools;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
