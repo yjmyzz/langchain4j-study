@@ -23,7 +23,7 @@ ollama:
 
 # DeepSeek配置
 deepseek:
-  api-key: sk-***
+  api-key: sk-********************
   base-url: https://api.deepseek.com
   model: deepseek-chat
   timeout: 60

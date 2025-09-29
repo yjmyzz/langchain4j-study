@@ -23,6 +23,7 @@
 1. **Java 21**: 确保已安装JDK 21
 2. **Maven 3.6+**: 确保已安装Maven
 3. **Ollama**: 确保已安装并启动Ollama服务
+4. **SSE服务器**: 如需使用MCP功能，请确保SSE服务器已启动（默认地址：http://localhost:8070/sse）
 
 ## 🛠️ 安装和配置
 
@@ -109,7 +110,16 @@ curl "http://localhost:8080/api/order/status/ollama?orderId=12345"
 
 # 通过DeepSeek模型调用工具
 curl "http://localhost:8080/api/order/status/deepseek?orderId=12345"
+
+# 通过MCP (Model Control Protocol)调用工具
+curl "http://localhost:8080/order?orderId=12345"
 ```
+
+##### MCP工具调用说明
+- MCP调用需要先启动SSE服务器（默认地址：http://localhost:8070/sse）
+- MCP调用支持通过DeepSeek模型进行智能交互
+- 支持自定义超时时间和工具执行超时设置
+- 提供完整的请求和响应日志记录
 
 #### 健康检查
 
@@ -163,17 +173,18 @@ deepseek:
 src/
 ├── main/
 │   ├── java/
-│   │   ├── com/cnblogs/tools/
-│   │   │   └── OrderTools.java                # 订单工具类
 │   │   └── com/cnblogs/yjmyzz/longchain4j/study/
 │   │       ├── LongChain4jStudyApplication.java    # 主启动类
 │   │       ├── config/
 │   │       │   ├── DeepSeekConfig.java            # DeepSeek配置类
 │   │       │   ├── OllamaConfig.java              # Ollama配置类
 │   │       │   └── OrderToolConfig.java           # 订单工具配置类
-│   │       └── controller/
-│   │           ├── ChatController.java            # 聊天控制器
-│   │           └── OrderController.java           # 订单控制器
+│   │       ├── controller/
+│   │       │   ├── ChatController.java            # 聊天控制器
+│   │       │   ├── OrderController.java           # 订单控制器
+│   │       │   └── McpController.java             # MCP工具调用控制器
+│   │       └── tools/
+│   │           └── OrderTools.java                # 订单工具类
 │   └── resources/
 │       └── application.yml                     # 应用配置
 └── test/
@@ -218,6 +229,16 @@ src/
 
 #### OrderController.java
 - 提供订单相关的RESTful API接口
+- 支持直接工具调用和AI辅助工具调用
+- 实现工具调用的多种方式（直接/Ollama/DeepSeek）
+- 包含健康检查端点
+
+#### McpController.java
+- 提供基于MCP (Model Control Protocol)的工具调用示例
+- 支持通过SSE服务器进行工具调用
+- 集成DeepSeek模型进行智能交互
+- 实现订单状态查询的MCP调用示例
+- 支持CORS跨域请求
 - 支持直接工具调用和AI辅助工具调用
 - 实现工具调用的多种方式（直接/Ollama/DeepSeek）
 - 包含健康检查端点
