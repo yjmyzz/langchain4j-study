@@ -25,6 +25,7 @@
     </properties>
 
     <dependencies>
+
         <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,11 +63,11 @@
             <version>${longchain4j.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-mcp</artifactId>
-            <version>1.1.0-beta7</version>
-        </dependency>
+<dependency>
+    <groupId>dev.langchain4j</groupId>
+    <artifactId>langchain4j-mcp</artifactId>
+    <version>1.1.0-beta7</version>
+</dependency>
 
         <!-- Spring Boot Test -->
         <dependency>

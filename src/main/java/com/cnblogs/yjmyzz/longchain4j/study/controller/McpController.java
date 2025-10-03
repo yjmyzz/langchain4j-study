@@ -25,31 +25,31 @@ public class McpController {
         String chat(String userMessage);
     }
 
-    /**
-     * 初始化SSE客户端
-     *
-     * @param sseUrl SSE服务器连接地址
-     * @return McpClient实例
-     */
-    private static McpClient initSseClient(String sseUrl) {
-        // 构建默认MCP客户端
-        return new DefaultMcpClient.Builder()
-                .clientName("yjmyzz.cnblogs.com")
-                .protocolVersion("2024-11-05")
-                .toolExecutionTimeout(Duration.ofSeconds(10))
-                // 配置HTTP传输层参数
-                .transport(new HttpMcpTransport.Builder()
-                        // 设置SSE服务器连接URL
-                        .sseUrl(sseUrl)
-                        // 设置连接超时时间
-                        .timeout(Duration.ofSeconds(10))
-                        // 启用请求日志记录
-                        .logRequests(true)
-                        // 启用响应日志记录
-                        .logResponses(true)
-                        .build())
-                .build();
-    }
+/**
+ * 初始化SSE客户端
+ *
+ * @param sseUrl SSE服务器连接地址
+ * @return McpClient实例
+ */
+private static McpClient initSseClient(String sseUrl) {
+    // 构建默认MCP客户端
+    return new DefaultMcpClient.Builder()
+            .clientName("yjmyzz.cnblogs.com")
+            .protocolVersion("2024-11-05")
+            .toolExecutionTimeout(Duration.ofSeconds(10))
+            // 配置HTTP传输层参数
+            .transport(new HttpMcpTransport.Builder()
+                    // 设置SSE服务器连接URL
+                    .sseUrl(sseUrl)
+                    // 设置连接超时时间
+                    .timeout(Duration.ofSeconds(10))
+                    // 启用请求日志记录
+                    .logRequests(true)
+                    // 启用响应日志记录
+                    .logResponses(true)
+                    .build())
+            .build();
+}
 
 
     @Autowired
