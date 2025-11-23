@@ -1,4 +1,4 @@
-package com.cnblogs.yjmyzz.longchain4j.study.controller;
+package com.cnblogs.yjmyzz.langchain4j.study.controller;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
@@ -98,7 +98,7 @@ public class ChatController {
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {
-        return ResponseEntity.ok("LongChain4j Study服务运行正常");
+        return ResponseEntity.ok("langchain4j Study服务运行正常");
     }
 
 

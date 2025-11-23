@@ -1,14 +1,14 @@
-# LongChain4j Study - Ollama聊天示例
+# langchain4j Study - Ollama聊天示例
 
-这是一个用于学习LongChain4j的Spring Boot项目，集成了本地Ollama服务，提供聊天功能示例。
+这是一个用于学习langchain4j的Spring Boot项目，集成了本地Ollama服务，提供聊天功能示例。
 
-**Package**: `com.cnblogs.yjmyzz.longchain4j.study`
+**Package**: `com.cnblogs.yjmyzz.langchain4j.study`
 
 ## 🚀 项目特性
 
 - **Java 21**: 使用最新的Java LTS版本
 - **Spring Boot 3.2.0**: 现代化的Spring Boot框架
-- **LongChain4j 1.1.0**: 强大的Java AI框架
+- **langchain4j 1.1.0**: 强大的Java AI框架
 - **Ollama集成**: 支持本地大语言模型
 - **RESTful API**: 提供完整的聊天API接口
 - **流式响应**: 支持Server-Sent Events (SSE)流式聊天
@@ -49,8 +49,8 @@ ollama pull llama2:13b
 ### 4. 克隆项目
 
 ```bash
-git clone https://github.com/yjmyzz/longchain4j-study.git
-cd longchain4j-study
+git clone https://github.com/yjmyzz/langchain4j-study.git
+cd langchain4j-study
 ```
 
 ### 5. 编译项目
@@ -101,12 +101,12 @@ server:
 # Spring应用配置
 spring:
   application:
-    name: longchain4j-study
+    name: langchain4j-study
   
   # 日志配置
   logging:
     level:
-      com.cnblogs.yjmyzz.longchain4j.study: DEBUG
+      com.cnblogs.yjmyzz.langchain4j.study: DEBUG
       dev.langchain4j: DEBUG
 
 # Ollama配置
@@ -121,8 +121,8 @@ ollama:
 ```
 src/
 ├── main/
-│   ├── java/com/cnblogs/yjmyzz/longchain4j/study/
-│   │   ├── LongChain4jStudyApplication.java    # 主启动类
+│   ├── java/com/cnblogs/yjmyzz/langchain4j/study/
+│   │   ├── langchain4jStudyApplication.java    # 主启动类
 │   │   ├── config/
 │   │   │   └── OllamaConfig.java              # Ollama配置类
 │   │   └── controller/
@@ -130,16 +130,16 @@ src/
 │   └── resources/
 │       └── application.yml                     # 应用配置
 └── test/
-    └── java/com/cnblogs/yjmyzz/longchain4j/study/
-        └── LongChain4jStudyApplicationTests.java  # 应用测试
+    └── java/com/cnblogs/yjmyzz/langchain4j/study/
+        └── langchain4jStudyApplicationTests.java  # 应用测试
 ```
 
 ## 📦 Package结构
 
 项目使用标准的Maven package命名规范：
 - **GroupId**: `com.yjmyzz`
-- **Package**: `com.cnblogs.yjmyzz.longchain4j.study`
-- **主类**: `LongChain4jStudyApplication`
+- **Package**: `com.cnblogs.yjmyzz.langchain4j.study`
+- **主类**: `langchain4jStudyApplication`
 
 ## 🔧 核心组件说明
 
@@ -158,8 +158,8 @@ src/
 ### 3. 主要依赖
 - **Spring Boot Web**: Web应用支持
 - **Spring WebFlux**: 响应式编程支持
-- **LongChain4j**: AI框架核心
-- **LongChain4j Ollama**: Ollama集成
+- **langchain4j**: AI框架核心
+- **langchain4j Ollama**: Ollama集成
 - **Lombok**: 代码简化工具
 
 ## 🧪 测试
@@ -173,7 +173,7 @@ mvn test
 ### 运行特定测试
 
 ```bash
-mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplicationTests
+mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.langchain4jStudyApplicationTests
 ```
 
 ## 🔧 开发指南
@@ -197,7 +197,7 @@ mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplication
 - 超时时间
 - 日志级别
 
-**注意**: 日志配置中的package路径为 `com.cnblogs.yjmyzz.longchain4j.study`
+**注意**: 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
 
 ## 🐛 故障排除
 
@@ -234,7 +234,7 @@ mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplication
 ## 📞 联系方式
 
 如有问题，请通过以下方式联系：
-- 提交GitHub Issue: https://github.com/yjmyzz/longchain4j-study/issues
+- 提交GitHub Issue: https://github.com/yjmyzz/langchain4j-study/issues
 - 作者博客: http://yjmyzz.cnblogs.com
 - 作者: 菩提树下的杨过
 

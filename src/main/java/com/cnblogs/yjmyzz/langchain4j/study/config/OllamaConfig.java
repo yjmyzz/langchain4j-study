@@ -1,4 +1,4 @@
-package com.cnblogs.yjmyzz.longchain4j.study.config;
+package com.cnblogs.yjmyzz.langchain4j.study.config;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
@@ -12,7 +12,7 @@ import java.time.Duration;
 
 /**
  * Ollama配置类
- * 用于配置LongChain4j与本地Ollama服务的连接
+ * 用于配置langchain4j与本地Ollama服务的连接
  *
  * @author 菩提树下的杨过
  * @version 1.0.0

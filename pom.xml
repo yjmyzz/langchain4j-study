@@ -7,21 +7,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>4.0.0</version>
         <relativePath/>
     </parent>
 
     <groupId>com.yjmyzz</groupId>
-    <artifactId>longchain4j-study</artifactId>
+    <artifactId>langchain4j-study</artifactId>
     <version>1.0.0</version>
-    <name>longchain4j-study</name>
-    <description>LongChain4j学习项目 - 集成Ollama聊天示例 by 菩提树下的杨过</description>
+    <name>langchain4j-study</name>
+    <description>langchain4j学习项目 - 集成Ollama聊天示例 by 菩提树下的杨过</description>
 
     <properties>
-        <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <longchain4j.version>1.1.0</longchain4j.version>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <langchain4j.version>1.8.0</langchain4j.version>
     </properties>
 
     <dependencies>
@@ -41,18 +41,18 @@
             <artifactId>spring-webflux</artifactId>
         </dependency>
 
-        <!-- LongChain4j Core -->
+        <!-- langchain4j Core -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
-            <version>${longchain4j.version}</version>
+            <version>${langchain4j.version}</version>
         </dependency>
 
-        <!-- LongChain4j Ollama Integration -->
+        <!-- langchain4j Ollama Integration -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-ollama</artifactId>
-            <version>1.1.0-rc1</version>
+            <version>${langchain4j.version}</version>
         </dependency>
 
         <!-- Spring Boot Test -->
@@ -75,10 +75,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.14.1</version>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
