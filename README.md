@@ -1,26 +1,22 @@
-# LongChain4j Study - 大模型聊天与工具调用示例
+# LangChain4j Study - 大模型工具调用示例
 
-这是一个用于学习LongChain4j的Spring Boot项目，集成了本地Ollama服务和DeepSeek云服务，提供聊天功能和工具调用示例。
+这是一个用于学习LangChain4j的Spring Boot项目，集成了本地Ollama服务，提供AI工具调用功能示例。
 
-**Package**: `com.cnblogs.yjmyzz.longchain4j.study`
+**Package**: `com.cnblogs.yjmyzz.langchain4j.study`
 
 ## 🚀 项目特性
 
-- **Java 21**: 使用最新的Java LTS版本
-- **Spring Boot 3.2.0**: 现代化的Spring Boot框架
-- **LongChain4j 1.1.0**: 强大的Java AI框架
-- **多模型支持**: 
-  - Ollama: 支持本地大语言模型
-  - DeepSeek: 支持云端大语言模型
+- **Java 25**: 使用最新的Java版本
+- **Spring Boot 4.0.0**: 现代化的Spring Boot框架
+- **LangChain4j 1.8.0**: 强大的Java AI框架
+- **Ollama集成**: 支持本地大语言模型
 - **工具调用**: 支持AI调用自定义工具（如订单查询）
-- **RESTful API**: 提供完整的聊天和工具调用API接口
-- **流式响应**: 支持Server-Sent Events (SSE)流式聊天
-- **Lombok**: 减少样板代码
+- **RESTful API**: 提供完整的工具调用API接口
 - **完整测试**: 包含单元测试和集成测试
 
 ## 📋 前置要求
 
-1. **Java 21**: 确保已安装JDK 21
+1. **Java 25**: 确保已安装JDK 25
 2. **Maven 3.6+**: 确保已安装Maven
 3. **Ollama**: 确保已安装并启动Ollama服务
 
@@ -40,10 +36,11 @@ ollama serve
 ### 3. 下载模型
 
 ```bash
-# 下载qwen3:0.6b模型（默认模型）
-ollama pull qwen3:0.6b
+# 下载deepseek-v3.1:671b-cloud模型（默认模型）
+ollama pull deepseek-v3.1:671b-cloud
 
 # 或者下载其他模型
+ollama pull qwen3:0.6b
 ollama pull llama2
 ollama pull llama2:7b
 ollama pull llama2:13b
@@ -52,8 +49,8 @@ ollama pull llama2:13b
 ### 4. 克隆项目
 
 ```bash
-git clone https://github.com/yjmyzz/longchain4j-study.git
-cd longchain4j-study
+git clone https://github.com/yjmyzz/langchain4j-study.git
+cd langchain4j-study
 ```
 
 ### 5. 编译项目
@@ -72,51 +69,25 @@ mvn spring-boot:run
 
 ### API接口
 
-#### 聊天功能
-
-##### 发送聊天消息
-
-```bash
-# 使用Ollama模型
-curl "http://localhost:8080/api/chat?prompt=你好，请介绍一下Java编程语言"
-
-# 使用DeepSeek模型
-curl "http://localhost:8080/api/chat/deepseek?prompt=你好，请介绍一下Java编程语言"
-```
-
-##### 流式聊天消息
-
-```bash
-# 使用Ollama模型
-curl "http://localhost:8080/api/chat/stream?prompt=你好，请介绍一下Java编程语言"
-
-# 使用DeepSeek模型
-curl "http://localhost:8080/api/chat/deepseek/stream?prompt=你好，请介绍一下Java编程语言"
-```
-
-**注意**: 流式API返回HTML格式的SSE数据，适合在浏览器中直接测试。
-
 #### 工具调用功能
 
 ##### 查询订单状态
 
 ```bash
-# 直接调用工具
+# 直接调用工具（不通过AI）
 curl "http://localhost:8080/api/order/status/direct?orderId=12345"
 
-# 通过Ollama模型调用工具
+# 通过Ollama模型调用工具（AI辅助分析）
 curl "http://localhost:8080/api/order/status/ollama?orderId=12345"
-
-# 通过DeepSeek模型调用工具
-curl "http://localhost:8080/api/order/status/deepseek?orderId=12345"
 ```
+
+**说明**：
+- `direct`: 直接调用工具方法，返回原始结果
+- `ollama`: 先调用工具获取结果，然后通过AI模型分析并给出用户友好的回复
 
 #### 健康检查
 
 ```bash
-# 聊天服务健康检查
-curl http://localhost:8080/api/health
-
 # 订单服务健康检查
 curl http://localhost:8080/api/order/health
 ```
@@ -133,28 +104,28 @@ server:
 # Spring应用配置
 spring:
   application:
-    name: longchain4j-study
+    name: langchain4j-study
   
   # 日志配置
   logging:
     level:
-      com.cnblogs.yjmyzz.longchain4j.study: DEBUG
+      com.cnblogs.yjmyzz.langchain4j.study: DEBUG
       dev.langchain4j: DEBUG
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # Ollama配置
 ollama:
   base-url: http://localhost:11434  # Ollama服务地址
-  model: qwen3:0.6b                 # 使用的模型名称
+  model: deepseek-v3.1:671b-cloud    # 使用的模型名称
   timeout: 60                       # 请求超时时间（秒）
 
-# DeepSeek配置
-deepseek:
-  api-key: your-api-key-here        # DeepSeek API密钥
-  base-url: https://api.deepseek.com # DeepSeek服务地址
-  model: deepseek-chat              # 使用的模型名称
-  timeout: 60                       # 请求超时时间（秒）
-  temperature: 0.7                  # 温度参数
-  max-tokens: 2048                  # 最大token数
+# 应用信息
+info:
+  app:
+    name: langchain4j Study
+    version: 1.0.0
+    description: LangChain4j学习项目 - Tool Calling
 ```
 
 ## 📁 项目结构
@@ -162,31 +133,30 @@ deepseek:
 ```
 src/
 ├── main/
-│   ├── java/
-│   │   ├── com/cnblogs/tools/
-│   │   │   └── OrderTools.java                # 订单工具类
-│   │   └── com/cnblogs/yjmyzz/longchain4j/study/
-│   │       ├── LongChain4jStudyApplication.java    # 主启动类
-│   │       ├── config/
-│   │       │   ├── DeepSeekConfig.java            # DeepSeek配置类
-│   │       │   ├── OllamaConfig.java              # Ollama配置类
-│   │       │   └── OrderToolConfig.java           # 订单工具配置类
-│   │       └── controller/
-│   │           ├── ChatController.java            # 聊天控制器
-│   │           └── OrderController.java           # 订单控制器
+│   ├── java/com/cnblogs/yjmyzz/langchain4j/study/
+│   │   ├── LangChain4jStudyApplication.java    # 主启动类
+│   │   ├── config/
+│   │   │   ├── OllamaConfig.java              # Ollama配置类
+│   │   │   └── OrderToolConfig.java           # 订单工具配置类
+│   │   ├── controller/
+│   │   │   └── OrderController.java           # 订单控制器
+│   │   └── tools/
+│   │       └── OrderTools.java                # 订单工具类
 │   └── resources/
 │       └── application.yml                     # 应用配置
 └── test/
-    └── java/com/cnblogs/yjmyzz/longchain4j/study/
-        └── LongChain4jStudyApplicationTests.java  # 应用测试
+    └── java/com/cnblogs/yjmyzz/langchain4j/study/
+        └── LangChain4jStudyApplicationTests.java  # 应用测试
 ```
 
 ## 📦 Package结构
 
 项目使用标准的Maven package命名规范：
 - **GroupId**: `com.yjmyzz`
-- **Package**: `com.cnblogs.yjmyzz.longchain4j.study`
-- **主类**: `LongChain4jStudyApplication`
+- **ArtifactId**: `langchain4j-study`
+- **Version**: `1.0.0`
+- **Package**: `com.cnblogs.yjmyzz.langchain4j.study`
+- **主类**: `LangChain4jStudyApplication`
 
 ## 🔧 核心组件说明
 
@@ -196,46 +166,37 @@ src/
 - 配置Ollama聊天模型和流式聊天模型
 - 支持自定义模型名称、服务地址和超时时间
 - 启用请求和响应日志记录
-
-#### DeepSeekConfig.java
-- 配置DeepSeek聊天模型和流式聊天模型
-- 支持API密钥、服务地址配置
-- 可调整温度和最大token数等参数
-- 启用请求和响应日志记录
+- 使用 `@Bean` 注解注册为Spring Bean，支持依赖注入
 
 #### OrderToolConfig.java
 - 配置订单工具的注册和管理
-- 集成工具到AI模型中
+- 将 `OrderTools` 注册为Spring Bean
+- 支持工具在AI模型中的集成
 
 ### 2. 控制器
 
-#### ChatController.java
-- 提供聊天相关的RESTful API接口
-- 支持普通聊天和流式聊天
-- 实现Server-Sent Events (SSE)流式响应
-- 支持Ollama和DeepSeek两种模型
-- 支持CORS跨域请求
-
 #### OrderController.java
 - 提供订单相关的RESTful API接口
-- 支持直接工具调用和AI辅助工具调用
-- 实现工具调用的多种方式（直接/Ollama/DeepSeek）
+- 支持直接工具调用（不通过AI）
+- 支持AI辅助工具调用（通过Ollama模型分析工具结果）
 - 包含健康检查端点
+- 使用 `@Qualifier` 注入指定的Ollama模型实例
 
 ### 3. 工具类
 
 #### OrderTools.java
 - 提供订单状态查询功能
-- 支持AI工具调用集成
-- 实现标准化的工具规范
+- 使用 `@Tool` 注解标记为AI可调用的工具
+- 使用 `@P` 注解描述工具参数
+- 实现标准化的工具规范，符合LangChain4j工具调用规范
 
 ### 4. 主要依赖
 - **Spring Boot Web**: Web应用支持
+- **Spring Boot Validation**: 数据验证支持
 - **Spring WebFlux**: 响应式编程支持
-- **LongChain4j**: AI框架核心
-- **LongChain4j Ollama**: Ollama集成
-- **LongChain4j OpenAI**: DeepSeek集成（兼容OpenAI接口）
-- **Lombok**: 代码简化工具
+- **LangChain4j**: AI框架核心（版本 1.8.0）
+- **LangChain4j Ollama**: Ollama集成
+- **Lombok**: 代码简化工具（注意：由于Java 25兼容性问题，项目已移除Lombok注解处理器的使用）
 
 ## 🧪 测试
 
@@ -248,47 +209,50 @@ mvn test
 ### 运行特定测试
 
 ```bash
-mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplicationTests
+mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.LangChain4jStudyApplicationTests
 ```
 
 ## 🔧 开发指南
 
-### 添加新的模型支持
-
-1. 创建新的模型配置类（参考 `OllamaConfig.java` 或 `DeepSeekConfig.java`）
-2. 在 `application.yml` 中添加相应的配置项
-3. 确保模型服务可用（本地或云端）
-
-### 扩展聊天功能
-
-1. 在 `ChatController` 中添加新的业务逻辑
-2. 添加新的API端点
-3. 实现自定义的响应处理器
-4. 支持新的模型调用方式
-
 ### 添加新的工具
 
-1. 创建工具类并实现相应的功能方法
-2. 添加工具配置类进行注册
-3. 在控制器中实现工具调用接口
-4. 支持直接调用和AI辅助调用
+1. 创建工具类，使用 `@Tool` 注解标记方法
+2. 使用 `@P` 注解描述方法参数
+3. 在配置类中注册工具为Spring Bean（参考 `OrderToolConfig.java`）
+4. 在控制器中实现工具调用接口
+5. 支持直接调用和AI辅助调用两种方式
+
+**示例**：
+```java
+public class MyTools {
+    @Tool("工具描述")
+    public String myMethod(@P("参数描述") String param) {
+        // 实现工具逻辑
+        return "结果";
+    }
+}
+```
+
+### 扩展工具调用功能
+
+1. 在控制器中添加新的工具调用端点
+2. 实现直接调用和AI辅助调用两种方式
+3. 使用 `@Qualifier` 注入指定的模型实例
+4. 添加适当的错误处理和日志记录
 
 ### 自定义配置
 
 可以通过修改 `application.yml` 来调整：
 - Ollama服务配置
-  - 服务地址
-  - 使用的模型
-  - 超时时间
-- DeepSeek服务配置
-  - API密钥
-  - 服务地址
-  - 模型参数
-- 日志级别
+  - 服务地址（`ollama.base-url`）
+  - 使用的模型（`ollama.model`）
+  - 超时时间（`ollama.timeout`，单位：秒）
+- 日志级别和格式
+- 服务器端口（默认8080）
 
 **注意**: 
-- 日志配置中的package路径为 `com.cnblogs.yjmyzz.longchain4j.study`
-- DeepSeek API密钥请妥善保管，不要提交到代码仓库
+- 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
+- 修改配置后需要重启应用才能生效
 
 ## 🐛 故障排除
 
@@ -299,29 +263,18 @@ mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplication
    - 检查端口11434是否被占用
    - 验证模型是否已下载：`ollama list`
 
-2. **DeepSeek连接失败**
-   - 检查API密钥是否正确配置
-   - 验证网络连接是否正常
-   - 确认API请求配额是否充足
-
-3. **模型响应缓慢**
+2. **模型响应缓慢**
    - 检查硬件资源（CPU、内存）
    - 考虑使用更小的模型
    - 调整超时配置
    - 对于本地模型，考虑使用GPU加速
 
-4. **内存不足**
+3. **内存不足**
    - 增加JVM堆内存：`-Xmx4g`
    - 使用更小的模型
    - 优化批处理大小
-   - 考虑使用云端模型（DeepSeek）
 
-5. **流式响应问题**
-   - 确保浏览器支持SSE
-   - 检查网络连接稳定性
-   - 查看应用日志排查问题
-
-6. **工具调用失败**
+4. **工具调用失败**
    - 检查工具类是否正确注册
    - 验证工具方法签名是否符合规范
    - 确认AI模型是否正确理解工具用途
@@ -338,7 +291,7 @@ mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplication
 ## 📞 联系方式
 
 如有问题，请通过以下方式联系：
-- 提交GitHub Issue: https://github.com/yjmyzz/longchain4j-study/issues
+- 提交GitHub Issue: https://github.com/yjmyzz/langchain4j-study/issues
 - 作者博客: http://yjmyzz.cnblogs.com
 - 作者: 菩提树下的杨过
 
@@ -349,6 +302,26 @@ mvn test -Dtest=com.cnblogs.yjmyzz.longchain4j.study.LongChain4jStudyApplication
 特别感谢以下官方文档资源：
 - [LangChain4j 中文文档](https://docs.langchain4j.info/) - 为Java应用赋能大模型能力的官方中文指南
 - [LangChain4j 英文文档](https://docs.langchain4j.dev/) - 官方英文文档，提供完整的技术参考
+- [Ollama官网](https://ollama.ai/) - 本地大语言模型运行环境
+
+## ⚠️ 重要说明
+
+### Java 25 兼容性
+
+项目使用 Java 25 进行开发。由于 Java 25 是较新的版本，某些工具可能尚未完全支持：
+
+- **Lombok**: 当前版本的 Lombok (1.18.36) 与 Java 25 存在兼容性问题，项目已移除 Lombok 注解处理器的使用
+- 所有日志记录使用标准的 SLF4J Logger，不依赖 Lombok 的 `@Slf4j` 注解
+- 如果遇到编译问题，请确保使用 JDK 25
+
+### 工具调用说明
+
+项目演示了如何使用 LangChain4j 实现 AI 工具调用功能：
+
+1. **工具定义**: 使用 `@Tool` 注解定义可被AI调用的工具方法
+2. **工具注册**: 通过配置类将工具注册为Spring Bean
+3. **工具调用**: 支持直接调用和AI辅助调用两种方式
+4. **AI集成**: AI模型可以理解工具的功能并自动调用
 
 ---
 

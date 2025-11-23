@@ -1,4 +1,4 @@
-package com.cnblogs.yjmyzz.longchain4j.study;
+package com.cnblogs.yjmyzz.langchain4j.study;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @version 1.0.0
  */
 @SpringBootTest
-class LongChain4jStudyApplicationTests {
+class LangChain4jStudyApplicationTests {
 
     @Test
     void contextLoads() {

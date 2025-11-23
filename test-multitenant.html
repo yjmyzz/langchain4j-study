@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多租户功能测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        input { padding: 5px; margin: 5px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 多租户功能测试</h1>
+    
+    <div class="test-section">
+        <h3>1. 健康检查</h3>
+        <button onclick="testHealth()">测试健康检查</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. API密钥验证</h3>
+        <input type="text" id="testApiKey" placeholder="输入API密钥进行验证" value="sk-test123456789012345678901234567890">
+        <button onclick="testValidateApiKey()">验证API密钥</button>
+        <div id="validateResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. 缓存统计</h3>
+        <button onclick="testCacheStats()">获取缓存统计</button>
+        <div id="cacheStatsResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. 聊天测试（需要有效API密钥）</h3>
+        <input type="text" id="chatApiKey" placeholder="输入有效的DeepSeek API密钥">
+        <input type="text" id="chatMessage" placeholder="输入聊天消息" value="你好，请介绍一下你自己">
+        <button onclick="testChat()">测试聊天</button>
+        <div id="chatResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. 缓存管理</h3>
+        <button onclick="testClearAllCache()">清除所有缓存</button>
+        <div id="clearCacheResult" class="result"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8080/api';
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${baseUrl}/health`);
+                const result = await response.text();
+                document.getElementById('healthResult').innerHTML = `<strong>成功:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = `<strong>错误:</strong> ${error.message}`;
+            }
+        }
+
+        async function testValidateApiKey() {
+            const apiKey = document.getElementById('testApiKey').value;
+            try {
+                const response = await fetch(`${baseUrl}/validate-api-key?apiKey=${encodeURIComponent(apiKey)}`);
+                const result = await response.text();
+                const status = response.ok ? '有效' : '无效';
+                document.getElementById('validateResult').innerHTML = `<strong>${status}:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('validateResult').innerHTML = `<strong>错误:</strong> ${error.message}`;
+            }
+        }
+
+        async function testCacheStats() {
+            try {
+                const response = await fetch(`${baseUrl}/cache/stats`);
+                const result = await response.text();
+                document.getElementById('cacheStatsResult').innerHTML = `<strong>缓存统计:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('cacheStatsResult').innerHTML = `<strong>错误:</strong> ${error.message}`;
+            }
+        }
+
+        async function testChat() {
+            const apiKey = document.getElementById('chatApiKey').value;
+            const message = document.getElementById('chatMessage').value;
+            
+            if (!apiKey) {
+                document.getElementById('chatResult').innerHTML = '<strong>错误:</strong> 请先输入API密钥';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${baseUrl}/chat?prompt=${encodeURIComponent(message)}&apiKey=${encodeURIComponent(apiKey)}`);
+                const result = await response.text();
+                const status = response.ok ? '成功' : '失败';
+                document.getElementById('chatResult').innerHTML = `<strong>${status}:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('chatResult').innerHTML = `<strong>错误:</strong> ${error.message}`;
+            }
+        }
+
+        async function testClearAllCache() {
+            try {
+                const response = await fetch(`${baseUrl}/cache/clear-all`, { method: 'POST' });
+                const result = await response.text();
+                const status = response.ok ? '成功' : '失败';
+                document.getElementById('clearCacheResult').innerHTML = `<strong>${status}:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('clearCacheResult').innerHTML = `<strong>错误:</strong> ${error.message}`;
+            }
+        }
+
+        // 页面加载时自动测试健康检查
+        window.onload = function() {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
