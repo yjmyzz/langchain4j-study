@@ -1,12 +1,12 @@
-package com.cnblogs.yjmyzz.longchain4j.study.controller;
+package com.cnblogs.yjmyzz.langchain4j.study.controller;
 
-import com.cnblogs.yjmyzz.longchain4j.study.service.DynamicConfigService;
+import com.cnblogs.yjmyzz.langchain4j.study.service.DynamicConfigService;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +22,12 @@ import reactor.core.publisher.Sinks;
  * @author 菩提树下的杨过
  * @version 1.0.0
  */
-@Slf4j
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ChatController {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     @Autowired
     private DynamicConfigService dynamicConfigService;
@@ -134,7 +134,7 @@ public class ChatController {
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {
-        return ResponseEntity.ok("LongChain4j Study服务运行正常");
+        return ResponseEntity.ok("langchain4j Study服务运行正常");
     }
 
     /**

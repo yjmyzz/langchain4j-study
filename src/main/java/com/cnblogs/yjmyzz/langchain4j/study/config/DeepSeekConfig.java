@@ -1,4 +1,4 @@
-package com.cnblogs.yjmyzz.longchain4j.study.config;
+package com.cnblogs.yjmyzz.langchain4j.study.config;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;

@@ -1,10 +1,11 @@
-package com.cnblogs.yjmyzz.longchain4j.study.service;
+package com.cnblogs.yjmyzz.langchain4j.study.service;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,9 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 菩提树下的杨过
  * @version 1.0.0
  */
-@Slf4j
 @Service
 public class DynamicConfigService {
+
+    private static final Logger log = LoggerFactory.getLogger(DynamicConfigService.class);
 
     private static final String DEFAULT_BASE_URL = "https://api.deepseek.com";
     private static final String DEFAULT_MODEL = "deepseek-chat";
