@@ -121,40 +121,25 @@ info:
     name: langchain4j Study
     version: 1.0.0
     description: langchain4j学习项目 - MCP工具调用示例
+```
 
 ## 📁 项目结构
 
 ```
 src/
 ├── main/
-│   ├── java/
-│   │   └── com/
-│   │       └── cnblogs/
-│   │           └── yjmyzz/
-│   │               └── langchain4j/
-│   │                   └── study/
-│   │                       ├── LongChain4jStudyApplication.java
-│   │                       ├── config/
-│   │                       │   └── OllamaConfig.java
-│   │                       └── controller/
-│   │                           └── McpController.java
+│   ├── java/com/cnblogs/yjmyzz/langchain4j/study/
+│   │   ├── LongChain4jStudyApplication.java    # 主启动类
+│   │   ├── config/
+│   │   │   └── OllamaConfig.java              # Ollama配置类
+│   │   └── controller/
+│   │       └── McpController.java             # MCP工具调用控制器
 │   └── resources/
-│       └── application.yml
+│       └── application.yml                     # 应用配置
 └── test/
-    └── java/
-        └── com/
-            └── cnblogs/
-                └── yjmyzz/
-                    └── langchain4j/
-                        └── study/
-                            └── LangChain4jStudyApplicationTests.java
+    └── java/com/cnblogs/yjmyzz/langchain4j/study/
+        └── LangChain4jStudyApplicationTests.java  # 应用测试
 ```
-
-**文件说明**：
-- `LongChain4jStudyApplication.java` - 主启动类
-- `OllamaConfig.java` - Ollama配置类
-- `McpController.java` - MCP工具调用控制器
-- `application.yml` - 应用配置文件
 
 ## 📦 Package结构
 
@@ -247,17 +232,17 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
 
 可以通过修改 `application.yml` 来调整：
 - Ollama服务配置
-  - 服务地址（`ollama.base-url`）
-  - 使用的模型（`ollama.model`）
-  - 超时时间（`ollama.timeout`，单位：秒）
+    - 服务地址（`ollama.base-url`）
+    - 使用的模型（`ollama.model`）
+    - 超时时间（`ollama.timeout`，单位：秒）
 - MCP客户端配置（在代码中）
-  - SSE服务器地址（默认：http://localhost:8070/sse）
-  - 连接超时时间（默认：10秒）
-  - 工具执行超时时间（默认：10秒）
+    - SSE服务器地址（默认：http://localhost:8070/sse）
+    - 连接超时时间（默认：10秒）
+    - 工具执行超时时间（默认：10秒）
 - 日志级别和格式
 - 服务器端口（默认8080）
 
-**注意**: 
+**注意**:
 - 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
 - 修改配置后需要重启应用才能生效
 - MCP客户端连接需要在每次请求时创建，使用完毕后必须关闭
@@ -268,40 +253,40 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
 ### 常见问题
 
 1. **Ollama连接失败**
-   - 确保Ollama服务已启动：`ollama serve`
-   - 检查端口11434是否被占用
-   - 验证模型是否已下载：`ollama list`
+    - 确保Ollama服务已启动：`ollama serve`
+    - 检查端口11434是否被占用
+    - 验证模型是否已下载：`ollama list`
 
 2. **MCP连接失败**
-   - 确保SSE服务器已启动（默认地址：http://localhost:8070/sse）
-   - 检查SSE服务器是否可访问：`curl http://localhost:8070/sse`
-   - 验证网络连接是否正常
-   - 检查SSE服务器端口是否被占用
-   - 查看应用日志中的MCP连接错误信息
+    - 确保SSE服务器已启动（默认地址：http://localhost:8070/sse）
+    - 检查SSE服务器是否可访问：`curl http://localhost:8070/sse`
+    - 验证网络连接是否正常
+    - 检查SSE服务器端口是否被占用
+    - 查看应用日志中的MCP连接错误信息
 
 3. **模型响应缓慢**
-   - 检查硬件资源（CPU、内存）
-   - 考虑使用更小的模型
-   - 调整超时配置
-   - 对于本地模型，考虑使用GPU加速
+    - 检查硬件资源（CPU、内存）
+    - 考虑使用更小的模型
+    - 调整超时配置
+    - 对于本地模型，考虑使用GPU加速
 
 4. **内存不足**
-   - 增加JVM堆内存：`-Xmx4g`
-   - 使用更小的模型
-   - 优化批处理大小
+    - 增加JVM堆内存：`-Xmx4g`
+    - 使用更小的模型
+    - 优化批处理大小
 
 5. **MCP工具调用失败**
-   - 检查SSE服务器是否正常运行
-   - 验证MCP客户端连接是否成功建立（查看日志中的连接信息）
-   - 确认工具在SSE服务器端是否正确注册和暴露
-   - 查看日志中的工具调用请求和响应详情
-   - 检查超时设置是否合理（默认10秒，可根据实际情况调整）
-   - 确认AI模型能够正确理解工具的功能描述
+    - 检查SSE服务器是否正常运行
+    - 验证MCP客户端连接是否成功建立（查看日志中的连接信息）
+    - 确认工具在SSE服务器端是否正确注册和暴露
+    - 查看日志中的工具调用请求和响应详情
+    - 检查超时设置是否合理（默认10秒，可根据实际情况调整）
+    - 确认AI模型能够正确理解工具的功能描述
 
 6. **Java 25 编译问题**
-   - 项目使用 Java 25，确保已安装 JDK 25
-   - 如果遇到 Lombok 相关编译错误，项目已移除 Lombok 注解处理器的使用
-   - 所有日志记录使用标准的 SLF4J Logger，不依赖 Lombok
+    - 项目使用 Java 25，确保已安装 JDK 25
+    - 如果遇到 Lombok 相关编译错误，项目已移除 Lombok 注解处理器的使用
+    - 所有日志记录使用标准的 SLF4J Logger，不依赖 Lombok
 
 ## 📝 许可证
 
