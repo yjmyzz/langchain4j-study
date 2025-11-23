@@ -1,4 +1,4 @@
-package com.cnblogs.yjmyzz.longchain4j.study.controller;
+package com.cnblogs.yjmyzz.langchain4j.study.controller;
 
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
@@ -7,6 +7,8 @@ import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.AiServices;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -15,11 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/mcp")
 @CrossOrigin(origins = "*")
 public class McpController {
+
+    private static final Logger log = LoggerFactory.getLogger(McpController.class);
 
     private interface Assistant {
         String chat(String userMessage);
@@ -53,8 +56,8 @@ private static McpClient initSseClient(String sseUrl) {
 
 
     @Autowired
-    @Qualifier("deepSeekChatModel")
-    private ChatModel deepSeekChatModel;
+    @Qualifier("ollamaChatModel")
+    private ChatModel chatModel;
 
     /**
      * 直接获取订单状态信息
@@ -72,8 +75,8 @@ private static McpClient initSseClient(String sseUrl) {
 
             // 构建AI助手服务，配置聊天模型和工具提供者
             Assistant assistant = AiServices.builder(Assistant.class)
-                    .chatModel(deepSeekChatModel)
-                    .toolProvider(McpToolProvider.builder().mcpClients(initSseClient("http://localhost:8070/sse")).build())
+                    .chatModel(chatModel)
+                    .toolProvider(McpToolProvider.builder().mcpClients(mcpClient).build())
                     .build();
 
             // 调用AI助手查询订单状态
