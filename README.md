@@ -127,18 +127,34 @@ info:
 ```
 src/
 ├── main/
-│   ├── java/com/cnblogs/yjmyzz/langchain4j/study/
-│   │   ├── LongChain4jStudyApplication.java    # 主启动类
-│   │   ├── config/
-│   │   │   └── OllamaConfig.java              # Ollama配置类
-│   │   └── controller/
-│   │       └── McpController.java             # MCP工具调用控制器
+│   ├── java/
+│   │   └── com/
+│   │       └── cnblogs/
+│   │           └── yjmyzz/
+│   │               └── langchain4j/
+│   │                   └── study/
+│   │                       ├── LongChain4jStudyApplication.java
+│   │                       ├── config/
+│   │                       │   └── OllamaConfig.java
+│   │                       └── controller/
+│   │                           └── McpController.java
 │   └── resources/
-│       └── application.yml                     # 应用配置
+│       └── application.yml
 └── test/
-    └── java/com/cnblogs/yjmyzz/langchain4j/study/
-        └── LangChain4jStudyApplicationTests.java  # 应用测试
+    └── java/
+        └── com/
+            └── cnblogs/
+                └── yjmyzz/
+                    └── langchain4j/
+                        └── study/
+                            └── LangChain4jStudyApplicationTests.java
 ```
+
+**文件说明**：
+- `LongChain4jStudyApplication.java` - 主启动类
+- `OllamaConfig.java` - Ollama配置类
+- `McpController.java` - MCP工具调用控制器
+- `application.yml` - 应用配置文件
 
 ## 📦 Package结构
 
