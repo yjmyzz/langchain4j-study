@@ -6,18 +6,19 @@
 
 ## 🚀 项目特性
 
-- **Java 21**: 使用最新的Java LTS版本
-- **Spring Boot 3.2.0**: 现代化的Spring Boot框架
-- **langchain4j 1.1.0**: 强大的Java AI框架
+- **Java 25**: 使用最新的Java版本
+- **Spring Boot 4.0.0**: 现代化的Spring Boot框架
+- **langchain4j 1.8.0**: 强大的Java AI框架
 - **Ollama集成**: 支持本地大语言模型
 - **RESTful API**: 提供完整的聊天API接口
 - **流式响应**: 支持Server-Sent Events (SSE)流式聊天
+- **Spring WebFlux**: 响应式编程支持
 - **Lombok**: 减少样板代码
 - **完整测试**: 包含单元测试和集成测试
 
 ## 📋 前置要求
 
-1. **Java 21**: 确保已安装JDK 21
+1. **Java 25**: 确保已安装JDK 25
 2. **Maven 3.6+**: 确保已安装Maven
 3. **Ollama**: 确保已安装并启动Ollama服务
 
@@ -37,10 +38,11 @@ ollama serve
 ### 3. 下载模型
 
 ```bash
-# 下载qwen3:0.6b模型（默认模型）
-ollama pull qwen3:0.6b
+# 下载deepseek-v3.1:671b-cloud模型（默认模型）
+ollama pull deepseek-v3.1:671b-cloud
 
 # 或者下载其他模型
+ollama pull qwen3:0.6b
 ollama pull llama2
 ollama pull llama2:7b
 ollama pull llama2:13b
@@ -108,12 +110,21 @@ spring:
     level:
       com.cnblogs.yjmyzz.langchain4j.study: DEBUG
       dev.langchain4j: DEBUG
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # Ollama配置
 ollama:
   base-url: http://localhost:11434  # Ollama服务地址
-  model: qwen3:0.6b                 # 使用的模型名称
+  model: deepseek-v3.1:671b-cloud    # 使用的模型名称
   timeout: 60                       # 请求超时时间（秒）
+
+# 应用信息
+info:
+  app:
+    name: langchain4j Study
+    version: 1.0.0
+    description: langchain4j学习项目 - 集成Ollama聊天示例
 ```
 
 ## 📁 项目结构
@@ -122,7 +133,7 @@ ollama:
 src/
 ├── main/
 │   ├── java/com/cnblogs/yjmyzz/langchain4j/study/
-│   │   ├── langchain4jStudyApplication.java    # 主启动类
+│   │   ├── LangChain4jStudyApplication.java    # 主启动类
 │   │   ├── config/
 │   │   │   └── OllamaConfig.java              # Ollama配置类
 │   │   └── controller/
@@ -131,15 +142,17 @@ src/
 │       └── application.yml                     # 应用配置
 └── test/
     └── java/com/cnblogs/yjmyzz/langchain4j/study/
-        └── langchain4jStudyApplicationTests.java  # 应用测试
+        └── LangChain4jStudyApplicationTests.java  # 应用测试
 ```
 
 ## 📦 Package结构
 
 项目使用标准的Maven package命名规范：
 - **GroupId**: `com.yjmyzz`
+- **ArtifactId**: `langchain4j-study`
+- **Version**: `1.0.0`
 - **Package**: `com.cnblogs.yjmyzz.langchain4j.study`
-- **主类**: `langchain4jStudyApplication`
+- **主类**: `LangChain4jStudyApplication`
 
 ## 🔧 核心组件说明
 
@@ -152,13 +165,16 @@ src/
 - 提供RESTful API接口
 - 支持普通聊天和流式聊天
 - 实现Server-Sent Events (SSE)流式响应
+- 使用Spring WebFlux的Flux实现响应式流式处理
 - 包含健康检查端点
 - 支持CORS跨域请求
+- 提供HTML转义功能，支持特殊字符处理
 
 ### 3. 主要依赖
 - **Spring Boot Web**: Web应用支持
-- **Spring WebFlux**: 响应式编程支持
-- **langchain4j**: AI框架核心
+- **Spring Boot Validation**: 数据验证支持
+- **Spring WebFlux**: 响应式编程支持（用于流式响应）
+- **langchain4j**: AI框架核心（版本 1.8.0）
 - **langchain4j Ollama**: Ollama集成
 - **Lombok**: 代码简化工具
 
@@ -182,6 +198,7 @@ mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.langchain4jStudyApplication
 
 1. 在 `application.yml` 中修改 `ollama.model` 配置
 2. 确保对应的模型已在Ollama中下载
+3. 重启应用使配置生效
 
 ### 扩展聊天功能
 
@@ -192,12 +209,15 @@ mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.langchain4jStudyApplication
 ### 自定义配置
 
 可以通过修改 `application.yml` 来调整：
-- Ollama服务地址
-- 使用的模型
-- 超时时间
-- 日志级别
+- Ollama服务地址（`ollama.base-url`）
+- 使用的模型（`ollama.model`）
+- 超时时间（`ollama.timeout`，单位：秒）
+- 日志级别和格式
+- 服务器端口（默认8080）
 
-**注意**: 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
+**注意**: 
+- 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
+- 修改配置后需要重启应用才能生效
 
 ## 🐛 故障排除
 
