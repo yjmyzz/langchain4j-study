@@ -1,6 +1,6 @@
-# langchain4j Study - MCP调用示例
+# langchain4j Study - RAG示例
 
-这是一个用于学习langchain4j的Spring Boot项目，集成了本地Ollama服务，通过MCP (Model Context Protocol) 协议实现AI工具调用功能示例。
+这是一个用于学习langchain4j的Spring Boot项目，集成了本地Ollama服务，演示了RAG（检索增强生成）和Embedding向量存储功能。
 
 **Package**: `com.cnblogs.yjmyzz.langchain4j.study`
 
@@ -9,18 +9,17 @@
 - **Java 25**: 使用最新的Java版本
 - **Spring Boot 4.0.0**: 现代化的Spring Boot框架
 - **LangChain4j 1.8.0**: 强大的Java AI框架
-- **Ollama集成**: 支持本地大语言模型
-- **MCP支持**: 支持Model Control Protocol (MCP)工具调用
-- **工具调用**: 支持通过MCP协议调用远程工具（如订单查询）
-- **RESTful API**: 提供完整的MCP工具调用API接口
-- **完整测试**: 包含单元测试和集成测试
+- **Ollama集成**: 支持本地大语言模型（默认使用deepseek-v3.1:671b-cloud）
+- **RAG支持**: 支持检索增强生成（Retrieval-Augmented Generation）
+- **Embedding模型**: 集成AllMiniLmL6V2 Embedding模型
+- **向量存储**: 支持InMemory向量存储和语义搜索
+- **RESTful API**: 提供完整的RAG功能API接口
 
 ## 📋 前置要求
 
 1. **Java 25**: 确保已安装JDK 25
 2. **Maven 3.6+**: 确保已安装Maven
 3. **Ollama**: 确保已安装并启动Ollama服务
-4. **SSE服务器**: 如需使用MCP功能，请确保SSE服务器已启动（默认地址：http://localhost:8070/sse）
 
 ## 🛠️ 安装和配置
 
@@ -38,10 +37,11 @@ ollama serve
 ### 3. 下载模型
 
 ```bash
-# 下载qwen3:0.6b模型（默认模型）
-ollama pull qwen3:0.6b
+# 下载deepseek-v3.1:671b-cloud模型（默认模型）
+ollama pull deepseek-v3.1:671b-cloud
 
 # 或者下载其他模型
+ollama pull qwen3:0.6b
 ollama pull llama2
 ollama pull llama2:7b
 ollama pull llama2:13b
@@ -70,22 +70,21 @@ mvn spring-boot:run
 
 ### API接口
 
-#### MCP工具调用功能
+#### RAG功能演示
 
-##### 查询订单状态（通过MCP）
+##### 内存向量存储和语义搜索
 
 ```bash
-# 通过MCP协议调用工具查询订单状态
-curl "http://localhost:8080/api/mcp/order?orderId=12345"
+# 测试InMemory向量存储和语义搜索
+curl "http://localhost:8080/api/rag/memory?query=What%20is%20your%20favourite%20sport?"
 ```
 
 **功能说明**：
-- MCP调用需要先启动SSE服务器（默认地址：http://localhost:8070/sse）
-- MCP调用通过Ollama模型进行智能交互，AI自动理解工具功能并调用
-- 支持自定义超时时间和工具执行超时设置（默认10秒）
-- 提供完整的请求和响应日志记录
-- 使用 `AiServices` 构建AI助手，自动处理工具调用流程
-- 自动管理MCP客户端连接的生命周期
+- 使用AllMiniLmL6V2 Embedding模型将文本转换为向量
+- 将文本片段存储到内存向量数据库（InMemoryEmbeddingStore）
+- 支持语义搜索，根据查询问题找到最相关的文本片段
+- 返回相似度分数和匹配的文本内容
+- 演示基本的RAG（检索增强生成）工作流程
 
 ## ⚙️ 配置说明
 
@@ -95,6 +94,8 @@ curl "http://localhost:8080/api/mcp/order?orderId=12345"
 # 服务器配置
 server:
   port: 8080
+  servlet:
+    context-path: /
 
 # Spring应用配置
 spring:
@@ -104,23 +105,23 @@ spring:
   # 日志配置
   logging:
     level:
-      com.cnblogs.yjmyzz.langchain4j.study: DEBUG
+      com.example.langchain4jstudy: DEBUG
       dev.langchain4j: DEBUG
     pattern:
       console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # Ollama配置
 ollama:
-  base-url: http://localhost:11434  # Ollama服务地址
-  model: qwen3:0.6b                 # 使用的模型名称
-  timeout: 60                       # 请求超时时间（秒）
+  base-url: http://localhost:11434          # Ollama服务地址
+  model: deepseek-v3.1:671b-cloud           # 使用的模型名称
+  timeout: 60                               # 请求超时时间（秒）
 
 # 应用信息
 info:
   app:
     name: langchain4j Study
     version: 1.0.0
-    description: langchain4j学习项目 - MCP工具调用示例
+    description: langchain4j学习项目 - RAG示例
 ```
 
 ## 📁 项目结构
@@ -133,7 +134,7 @@ src/
 │   │   ├── config/
 │   │   │   └── OllamaConfig.java              # Ollama配置类
 │   │   └── controller/
-│   │       └── McpController.java             # MCP工具调用控制器
+│   │       └── RAGController.java             # RAG功能控制器
 │   └── resources/
 │       └── application.yml                     # 应用配置
 └── test/
@@ -163,14 +164,14 @@ src/
 
 ### 2. 控制器
 
-#### McpController.java
-- 提供基于MCP (Model Control Protocol)的工具调用示例
-- 支持通过SSE服务器进行工具调用（默认地址：http://localhost:8070/sse）
-- 集成Ollama模型进行智能交互，AI自动理解并调用远程工具
-- 使用 `AiServices` 构建AI助手，简化工具调用流程
-- 实现订单状态查询的MCP调用示例
+#### RAGController.java
+- 提供RAG（检索增强生成）功能演示
+- 实现InMemory向量存储功能
+- 集成AllMiniLmL6V2 Embedding模型进行文本向量化
+- 支持语义搜索和相似度匹配
+- 提供 `/api/rag/memory` 接口进行向量检索演示
 - 支持CORS跨域请求
-- 自动管理MCP客户端连接的生命周期，确保资源正确释放
+- 返回相似度分数和匹配文本
 
 ### 3. 主要依赖
 - **Spring Boot Web**: Web应用支持
@@ -178,8 +179,8 @@ src/
 - **Spring WebFlux**: 响应式编程支持
 - **LangChain4j**: AI框架核心（版本 1.8.0）
 - **LangChain4j Ollama**: Ollama集成
-- **LangChain4j MCP**: MCP协议支持（版本 1.1.0-beta7）
-- **Lombok**: 代码简化工具（注意：由于Java 25兼容性问题，项目已移除Lombok注解处理器的使用）
+- **LangChain4j Embeddings**: AllMiniLmL6V2 Embedding模型（版本 1.9.1-beta17）
+- **Lombok**: 代码简化工具（可选依赖）
 
 ## 🧪 测试
 
@@ -197,33 +198,39 @@ mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.LangChain4jStudyApplication
 
 ## 🔧 开发指南
 
-### 添加新的MCP工具调用
+### 添加新的RAG功能
 
-1. 在 `McpController` 中添加新的端点方法
-2. 使用 `initSseClient` 方法初始化MCP客户端连接（可自定义SSE服务器地址）
-3. 使用 `AiServices.builder` 构建AI助手，配置聊天模型和 `McpToolProvider`
-4. 通过AI助手发送自然语言请求，AI会自动理解工具功能并调用
-5. 确保在 `finally` 块中关闭MCP客户端连接，避免资源泄漏
+1. 在 `RAGController` 中添加新的端点方法
+2. 创建 `EmbeddingStore` 实例（如 `InMemoryEmbeddingStore`）
+3. 使用 `EmbeddingModel` 将文本转换为向量
+4. 将向量和文本片段存储到向量数据库
+5. 使用查询向量进行语义搜索
+6. 返回匹配结果和相似度分数
 
 **示例**：
 ```java
-@GetMapping("/my-tool")
-public ResponseEntity<String> callMyTool(@RequestParam String param) {
-    McpClient mcpClient = null;
+@GetMapping("/search")
+public ResponseEntity<String> semanticSearch(@RequestParam String query) {
     try {
-        mcpClient = initSseClient("http://localhost:8070/sse");
-        Assistant assistant = AiServices.builder(Assistant.class)
-                .chatModel(chatModel)
-                .toolProvider(McpToolProvider.builder().mcpClients(mcpClient).build())
+        EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+        EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+        
+        // 添加文本片段
+        TextSegment segment = TextSegment.from("Your text here");
+        Embedding embedding = embeddingModel.embed(segment).content();
+        embeddingStore.add(embedding, segment);
+        
+        // 语义搜索
+        Embedding queryEmbedding = embeddingModel.embed(query).content();
+        EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
+                .queryEmbedding(queryEmbedding)
+                .maxResults(1)
                 .build();
-        String response = assistant.chat("使用工具处理：" + param);
-        return ResponseEntity.ok(response);
+        List<EmbeddingMatch<TextSegment>> matches = embeddingStore.search(request).matches();
+        
+        return ResponseEntity.ok(matches.toString());
     } catch (Exception e) {
         return ResponseEntity.ok("{\"error\":\"" + e.getMessage() + "\"}");
-    } finally {
-        if (mcpClient != null) {
-            mcpClient.close();
-        }
     }
 }
 ```
@@ -235,18 +242,13 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
     - 服务地址（`ollama.base-url`）
     - 使用的模型（`ollama.model`）
     - 超时时间（`ollama.timeout`，单位：秒）
-- MCP客户端配置（在代码中）
-    - SSE服务器地址（默认：http://localhost:8070/sse）
-    - 连接超时时间（默认：10秒）
-    - 工具执行超时时间（默认：10秒）
 - 日志级别和格式
 - 服务器端口（默认8080）
 
 **注意**:
-- 日志配置中的package路径为 `com.cnblogs.yjmyzz.langchain4j.study`
+- 日志配置中的package路径为 `com.example.langchain4jstudy`
 - 修改配置后需要重启应用才能生效
-- MCP客户端连接需要在每次请求时创建，使用完毕后必须关闭
-- SSE服务器地址可以在代码中自定义，默认使用 `http://localhost:8070/sse`
+- Embedding模型会在首次使用时自动下载，需要一定的磁盘空间
 
 ## 🐛 故障排除
 
@@ -256,13 +258,13 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
     - 确保Ollama服务已启动：`ollama serve`
     - 检查端口11434是否被占用
     - 验证模型是否已下载：`ollama list`
+    - 确认使用的模型名称正确（默认：deepseek-v3.1:671b-cloud）
 
-2. **MCP连接失败**
-    - 确保SSE服务器已启动（默认地址：http://localhost:8070/sse）
-    - 检查SSE服务器是否可访问：`curl http://localhost:8070/sse`
-    - 验证网络连接是否正常
-    - 检查SSE服务器端口是否被占用
-    - 查看应用日志中的MCP连接错误信息
+2. **Embedding模型加载失败**
+    - 首次使用时会自动下载AllMiniLmL6V2模型
+    - 检查网络连接是否正常
+    - 确保有足够的磁盘空间存储模型文件
+    - 查看日志中的模型加载信息
 
 3. **模型响应缓慢**
     - 检查硬件资源（CPU、内存）
@@ -273,20 +275,18 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
 4. **内存不足**
     - 增加JVM堆内存：`-Xmx4g`
     - 使用更小的模型
-    - 优化批处理大小
+    - 减少向量数据库中存储的文本片段数量
 
-5. **MCP工具调用失败**
-    - 检查SSE服务器是否正常运行
-    - 验证MCP客户端连接是否成功建立（查看日志中的连接信息）
-    - 确认工具在SSE服务器端是否正确注册和暴露
-    - 查看日志中的工具调用请求和响应详情
-    - 检查超时设置是否合理（默认10秒，可根据实际情况调整）
-    - 确认AI模型能够正确理解工具的功能描述
+5. **向量搜索结果不准确**
+    - 调整 `maxResults` 参数获取更多候选结果
+    - 检查相似度分数阈值是否合理
+    - 优化文本预处理和分段策略
+    - 考虑使用更强大的Embedding模型
 
-6. **Java 25 编译问题**
+6. **Java 25 兼容性**
     - 项目使用 Java 25，确保已安装 JDK 25
-    - 如果遇到 Lombok 相关编译错误，项目已移除 Lombok 注解处理器的使用
-    - 所有日志记录使用标准的 SLF4J Logger，不依赖 Lombok
+    - Maven编译器插件设置为Java 25
+    - Lombok为可选依赖，打包时会被排除
 
 ## 📝 许可证
 
@@ -317,22 +317,30 @@ public ResponseEntity<String> callMyTool(@RequestParam String param) {
 
 ### Java 25 兼容性
 
-项目使用 Java 25 进行开发。由于 Java 25 是较新的版本，某些工具可能尚未完全支持：
+项目使用 Java 25 和 Spring Boot 4.0.0 进行开发：
 
-- **Lombok**: 当前版本的 Lombok 与 Java 25 存在兼容性问题，项目已移除 Lombok 注解处理器的使用
-- 所有日志记录使用标准的 SLF4J Logger，不依赖 Lombok 的 `@Slf4j` 注解
-- 如果遇到编译问题，请确保使用 JDK 25
+- **Java 25**: 确保已安装 JDK 25
+- **Maven配置**: 编译器源码和目标版本都设置为25
+- **Lombok**: 作为可选依赖，打包时会被排除
+- 所有日志记录使用标准的 SLF4J Logger
 
-### MCP工具调用说明
+### RAG功能说明
 
-项目演示了如何使用 LangChain4j MCP 实现 AI 工具调用功能：
+项目演示了如何使用 LangChain4j 实现 RAG（检索增强生成）功能：
 
-1. **MCP客户端**: 使用 `DefaultMcpClient` 连接到SSE服务器，支持HTTP传输层
-2. **工具提供者**: 使用 `McpToolProvider` 将MCP工具提供给AI模型
-3. **AI助手**: 使用 `AiServices` 构建AI助手，简化工具调用流程
-4. **智能调用**: AI模型可以理解工具的功能描述，并根据用户请求自动调用相应的远程工具
-5. **连接管理**: 每次请求创建新的MCP客户端连接，使用完毕后自动关闭，确保资源正确释放
+1. **Embedding模型**: 使用 AllMiniLmL6V2 模型将文本转换为向量
+2. **向量存储**: 使用 `InMemoryEmbeddingStore` 存储文本向量
+3. **语义搜索**: 根据查询问题的语义相似度检索相关文本
+4. **相似度计算**: 返回匹配文本和相似度分数
+5. **扩展性**: 可以轻松替换为其他向量数据库（如Pinecone、Qdrant等）
+
+### 技术架构
+
+- **Spring Boot**: 提供Web服务和依赖注入
+- **LangChain4j**: 提供AI集成能力
+- **Ollama**: 提供本地大语言模型服务
+- **Embedding**: 提供文本向量化能力
 
 ---
 
-**注意**: 请确保在使用前已正确安装和配置Ollama服务，以及启动SSE服务器（如果使用MCP功能）。
+**注意**: 请确保在使用前已正确安装和配置Ollama服务，并下载所需的模型。

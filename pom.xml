@@ -15,10 +15,9 @@
     <artifactId>langchain4j-study</artifactId>
     <version>1.0.0</version>
     <name>langchain4j-study</name>
-    <description>langchain4j学习项目 - mcp调用示例 by 菩提树下的杨过</description>
+    <description>langchain4j学习项目 - RAG示例 by 菩提树下的杨过</description>
 
     <properties>
-        <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,19 +57,6 @@
             <version>${langchain4j.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-mcp</artifactId>
-            <version>1.1.0-beta7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-redis</artifactId>
-            <version>1.0.0-alpha1</version>
-        </dependency>
-
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
@@ -99,8 +85,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
