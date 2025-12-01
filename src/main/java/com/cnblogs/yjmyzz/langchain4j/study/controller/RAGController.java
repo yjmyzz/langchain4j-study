@@ -1,15 +1,24 @@
 package com.cnblogs.yjmyzz.langchain4j.study.controller;
 
+import com.cnblogs.yjmyzz.langchain4j.study.config.OllamaConfig;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -24,47 +33,90 @@ public class RAGController {
 
     private static final Logger log = LoggerFactory.getLogger(RAGController.class);
 
+    EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+    @Autowired
+    @Qualifier("ollamaEmbeddingModel")
+    OllamaEmbeddingModel ollamaEmbeddingModel;
+
+    @Autowired
+    @Qualifier("ollamaChatModel")
+    @Lazy
+    OllamaChatModel ollamaChatModel;
+
     private interface Assistant {
         String chat(String userMessage);
     }
 
-
-    @GetMapping(value = "/memory", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> testInMemoryEmbed(@RequestParam(required = false) String query) {
+    @GetMapping(value = "/embed/memory", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> embedMemory() {
         try {
-            EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-
-            EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-
             TextSegment segment1 = TextSegment.from("I like football.");
-            Embedding embedding1 = embeddingModel.embed(segment1).content();
+            Embedding embedding1 = ollamaEmbeddingModel.embed(segment1).content();
             embeddingStore.add(embedding1, segment1);
 
             TextSegment segment2 = TextSegment.from("The weather is good today.");
-            Embedding embedding2 = embeddingModel.embed(segment2).content();
+            Embedding embedding2 = ollamaEmbeddingModel.embed(segment2).content();
             embeddingStore.add(embedding2, segment2);
 
+            return ResponseEntity.ok("{\"code\":\"success\"}");
+        } catch (Exception e) {
+            log.error("embed-in-memory", e);
+            return ResponseEntity.ok("{\"error\":\"embed in-memory error: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @GetMapping(value = "/query/memory", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> queryInMemory(@RequestParam(required = false) String query) {
+        try {
             if (!StringUtils.hasText(query)) {
                 query = "What is your favourite sport?";
             }
 
-            Embedding queryEmbedding = embeddingModel.embed(query).content();
+            Embedding queryEmbedding = ollamaEmbeddingModel.embed(query).content();
             EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
                     .queryEmbedding(queryEmbedding)
                     .maxResults(1)
                     .build();
             List<EmbeddingMatch<TextSegment>> matches = embeddingStore.search(embeddingSearchRequest).matches();
-            EmbeddingMatch<TextSegment> embeddingMatch = matches.getFirst();
-
-            System.out.println(embeddingMatch.score()); // 0.8144288659095
-            System.out.println(embeddingMatch.embedded().text()); // I like football.
-
-
-            String response = embeddingMatch.score() + " => " + embeddingMatch.embedded().text();
-            return ResponseEntity.ok(response);
+            EmbeddingMatch<TextSegment> embeddingMatch = matches.get(0);
+            return ResponseEntity.ok("{\"score\":" + embeddingMatch.score() + "\",\"text\":\"" + embeddingMatch.embedded().text() + "\"}");
         } catch (Exception e) {
-            log.error("测试InMemory embed错误", e);
-            return ResponseEntity.ok("{\"error\":\"测试InMemory embed失败: " + e.getMessage() + "\"}");
+            log.error("query-in-memory", e);
+            return ResponseEntity.ok("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+    /**
+     * 基于RAG的AI聊天
+     *
+     * @param query
+     * @return
+     */
+    @GetMapping(value = "/query/bot", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> bot(@RequestParam(required = false) String query) {
+        try {
+            if (!StringUtils.hasText(query)) {
+                query = "What is your favourite sport?";
+            }
+
+            ContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
+                    .embeddingStore(embeddingStore)
+                    .embeddingModel(ollamaEmbeddingModel)
+                    .maxResults(3)
+                    .minScore(0.6)
+                    .build();
+
+            Assistant assistant = AiServices.builder(Assistant.class)
+                    .chatModel(ollamaChatModel)
+                    .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                    .contentRetriever(retriever)
+                    .build();
+
+            return ResponseEntity.ok(assistant.chat(query));
+        } catch (Exception e) {
+            log.error("bot", e);
+            return ResponseEntity.ok("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
 

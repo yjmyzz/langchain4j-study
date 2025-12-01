@@ -11,9 +11,9 @@
 - **LangChain4j 1.8.0**: 强大的Java AI框架
 - **Ollama集成**: 支持本地大语言模型（默认使用deepseek-v3.1:671b-cloud）
 - **RAG支持**: 支持检索增强生成（Retrieval-Augmented Generation）
-- **Embedding模型**: 集成AllMiniLmL6V2 Embedding模型
+- **Embedding模型**: 集成Ollama Embedding模型（默认使用nomic-embed-text:latest）
 - **向量存储**: 支持InMemory向量存储和语义搜索
-- **RESTful API**: 提供完整的RAG功能API接口
+- **RESTful API**: 提供完整的RAG功能API接口（向量存储、语义搜索、RAG聊天）
 
 ## 📋 前置要求
 
@@ -37,8 +37,11 @@ ollama serve
 ### 3. 下载模型
 
 ```bash
-# 下载deepseek-v3.1:671b-cloud模型（默认模型）
+# 下载聊天模型（默认模型）
 ollama pull deepseek-v3.1:671b-cloud
+
+# 下载Embedding模型（用于向量化）
+ollama pull nomic-embed-text:latest
 
 # 或者下载其他模型
 ollama pull qwen3:0.6b
@@ -72,19 +75,44 @@ mvn spring-boot:run
 
 #### RAG功能演示
 
-##### 内存向量存储和语义搜索
+##### 1. 向量存储（Embedding）
 
 ```bash
-# 测试InMemory向量存储和语义搜索
-curl "http://localhost:8080/api/rag/memory?query=What%20is%20your%20favourite%20sport?"
+# 将文本片段转换为向量并存储到内存
+curl "http://localhost:8080/api/rag/embed/memory"
 ```
 
 **功能说明**：
-- 使用AllMiniLmL6V2 Embedding模型将文本转换为向量
+- 使用Ollama Embedding模型（nomic-embed-text）将文本转换为向量
 - 将文本片段存储到内存向量数据库（InMemoryEmbeddingStore）
-- 支持语义搜索，根据查询问题找到最相关的文本片段
+- 示例中包含两个文本片段："I like football." 和 "The weather is good today."
+
+##### 2. 语义搜索（Query）
+
+```bash
+# 根据查询问题在向量数据库中搜索最相关的文本片段
+curl "http://localhost:8080/api/rag/query/memory?query=What%20is%20your%20favourite%20sport?"
+```
+
+**功能说明**：
+- 将查询问题转换为向量
+- 在向量数据库中进行语义搜索
 - 返回相似度分数和匹配的文本内容
-- 演示基本的RAG（检索增强生成）工作流程
+- 默认查询："What is your favourite sport?"
+
+##### 3. RAG聊天（Bot）
+
+```bash
+# 基于RAG的AI聊天，自动检索相关上下文并生成回答
+curl "http://localhost:8080/api/rag/query/bot?query=What%20is%20your%20favourite%20sport?"
+```
+
+**功能说明**：
+- 使用 `EmbeddingStoreContentRetriever` 自动检索相关上下文
+- 将检索到的上下文与用户问题一起发送给AI模型
+- AI基于检索到的上下文生成更准确的回答
+- 支持对话记忆（MessageWindowChatMemory）
+- 演示完整的RAG（检索增强生成）工作流程
 
 ## ⚙️ 配置说明
 
@@ -113,7 +141,8 @@ spring:
 # Ollama配置
 ollama:
   base-url: http://localhost:11434          # Ollama服务地址
-  model: deepseek-v3.1:671b-cloud           # 使用的模型名称
+  model: deepseek-v3.1:671b-cloud           # 聊天模型名称
+  embedding-model: nomic-embed-text:latest  # Embedding模型名称
   timeout: 60                               # 请求超时时间（秒）
 
 # 应用信息
@@ -156,20 +185,28 @@ src/
 ### 1. 配置类
 
 #### OllamaConfig.java
-- 配置Ollama聊天模型和流式聊天模型
-- 支持自定义模型名称、服务地址和超时时间
+- 配置Ollama聊天模型、流式聊天模型和Embedding模型
+- 支持自定义模型名称、Embedding模型名称、服务地址和超时时间
 - 启用请求和响应日志记录
 - 使用 `@Bean` 注解注册为Spring Bean，支持依赖注入
-- Bean名称：`ollamaChatModel` 和 `ollamaStreamingChatModel`
+- Bean名称：
+  - `ollamaChatModel` - 聊天模型
+  - `ollamaStreamingChatModel` - 流式聊天模型
+  - `ollamaEmbeddingModel` - Embedding模型
 
 ### 2. 控制器
 
 #### RAGController.java
 - 提供RAG（检索增强生成）功能演示
-- 实现InMemory向量存储功能
-- 集成AllMiniLmL6V2 Embedding模型进行文本向量化
+- 实现InMemory向量存储功能（`InMemoryEmbeddingStore`）
+- 集成Ollama Embedding模型进行文本向量化
 - 支持语义搜索和相似度匹配
-- 提供 `/api/rag/memory` 接口进行向量检索演示
+- 提供三个API接口：
+  - `/api/rag/embed/memory` - 向量存储接口
+  - `/api/rag/query/memory` - 语义搜索接口
+  - `/api/rag/query/bot` - RAG聊天接口
+- 使用 `EmbeddingStoreContentRetriever` 实现内容检索
+- 使用 `AiServices` 构建RAG助手，自动集成检索功能
 - 支持CORS跨域请求
 - 返回相似度分数和匹配文本
 
@@ -178,8 +215,7 @@ src/
 - **Spring Boot Validation**: 数据验证支持
 - **Spring WebFlux**: 响应式编程支持
 - **LangChain4j**: AI框架核心（版本 1.8.0）
-- **LangChain4j Ollama**: Ollama集成
-- **LangChain4j Embeddings**: AllMiniLmL6V2 Embedding模型（版本 1.9.1-beta17）
+- **LangChain4j Ollama**: Ollama集成（包含聊天模型和Embedding模型支持）
 - **Lombok**: 代码简化工具（可选依赖）
 
 ## 🧪 测试
@@ -201,19 +237,22 @@ mvn test -Dtest=com.cnblogs.yjmyzz.langchain4j.study.LangChain4jStudyApplication
 ### 添加新的RAG功能
 
 1. 在 `RAGController` 中添加新的端点方法
-2. 创建 `EmbeddingStore` 实例（如 `InMemoryEmbeddingStore`）
+2. 注入 `OllamaEmbeddingModel` 和 `OllamaChatModel`（已配置为Spring Bean）
 3. 使用 `EmbeddingModel` 将文本转换为向量
-4. 将向量和文本片段存储到向量数据库
+4. 将向量和文本片段存储到 `InMemoryEmbeddingStore`
 5. 使用查询向量进行语义搜索
 6. 返回匹配结果和相似度分数
 
 **示例**：
 ```java
+@Autowired
+@Qualifier("ollamaEmbeddingModel")
+OllamaEmbeddingModel embeddingModel;
+
 @GetMapping("/search")
 public ResponseEntity<String> semanticSearch(@RequestParam String query) {
     try {
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-        EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
         
         // 添加文本片段
         TextSegment segment = TextSegment.from("Your text here");
@@ -235,12 +274,32 @@ public ResponseEntity<String> semanticSearch(@RequestParam String query) {
 }
 ```
 
+### 实现完整的RAG聊天
+
+使用 `AiServices` 和 `EmbeddingStoreContentRetriever` 实现完整的RAG功能：
+
+```java
+ContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
+        .embeddingStore(embeddingStore)
+        .embeddingModel(embeddingModel)
+        .maxResults(3)      // 最多返回3个相关片段
+        .minScore(0.6)      // 最小相似度分数
+        .build();
+
+Assistant assistant = AiServices.builder(Assistant.class)
+        .chatModel(chatModel)
+        .contentRetriever(retriever)  // 自动集成检索功能
+        .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+        .build();
+```
+
 ### 自定义配置
 
 可以通过修改 `application.yml` 来调整：
 - Ollama服务配置
     - 服务地址（`ollama.base-url`）
-    - 使用的模型（`ollama.model`）
+    - 聊天模型（`ollama.model`，默认：deepseek-v3.1:671b-cloud）
+    - Embedding模型（`ollama.embedding-model`，默认：nomic-embed-text:latest）
     - 超时时间（`ollama.timeout`，单位：秒）
 - 日志级别和格式
 - 服务器端口（默认8080）
@@ -248,7 +307,7 @@ public ResponseEntity<String> semanticSearch(@RequestParam String query) {
 **注意**:
 - 日志配置中的package路径为 `com.example.langchain4jstudy`
 - 修改配置后需要重启应用才能生效
-- Embedding模型会在首次使用时自动下载，需要一定的磁盘空间
+- Embedding模型需要在Ollama中提前下载：`ollama pull nomic-embed-text:latest`
 
 ## 🐛 故障排除
 
@@ -261,10 +320,10 @@ public ResponseEntity<String> semanticSearch(@RequestParam String query) {
     - 确认使用的模型名称正确（默认：deepseek-v3.1:671b-cloud）
 
 2. **Embedding模型加载失败**
-    - 首次使用时会自动下载AllMiniLmL6V2模型
-    - 检查网络连接是否正常
-    - 确保有足够的磁盘空间存储模型文件
-    - 查看日志中的模型加载信息
+   - 确保已在Ollama中下载Embedding模型：`ollama pull nomic-embed-text:latest`
+   - 检查Ollama服务是否正常运行
+   - 验证模型名称是否正确（默认：nomic-embed-text:latest）
+   - 查看日志中的模型加载错误信息
 
 3. **模型响应缓慢**
     - 检查硬件资源（CPU、内存）
@@ -328,11 +387,13 @@ public ResponseEntity<String> semanticSearch(@RequestParam String query) {
 
 项目演示了如何使用 LangChain4j 实现 RAG（检索增强生成）功能：
 
-1. **Embedding模型**: 使用 AllMiniLmL6V2 模型将文本转换为向量
-2. **向量存储**: 使用 `InMemoryEmbeddingStore` 存储文本向量
-3. **语义搜索**: 根据查询问题的语义相似度检索相关文本
-4. **相似度计算**: 返回匹配文本和相似度分数
-5. **扩展性**: 可以轻松替换为其他向量数据库（如Pinecone、Qdrant等）
+1. **Embedding模型**: 使用 Ollama Embedding模型（nomic-embed-text）将文本转换为向量
+2. **向量存储**: 使用 `InMemoryEmbeddingStore` 存储文本向量和元数据
+3. **语义搜索**: 根据查询问题的语义相似度检索相关文本片段
+4. **相似度计算**: 返回匹配文本和相似度分数（0-1之间）
+5. **内容检索器**: 使用 `EmbeddingStoreContentRetriever` 自动检索相关上下文
+6. **AI集成**: 使用 `AiServices` 将检索到的上下文与用户问题一起发送给AI模型
+7. **扩展性**: 可以轻松替换为其他向量数据库（如Pinecone、Qdrant、Chroma等）
 
 ### 技术架构
 
