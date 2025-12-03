@@ -36,13 +36,13 @@ public class RAGController {
     EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
     @Autowired
-    @Qualifier("ollamaEmbeddingModel")
-    OllamaEmbeddingModel ollamaEmbeddingModel;
-
-    @Autowired
     @Qualifier("ollamaChatModel")
     @Lazy
     OllamaChatModel ollamaChatModel;
+
+    @Autowired
+    @Qualifier("ollamaEmbeddingModel")
+    OllamaEmbeddingModel ollamaEmbeddingModel;
 
     private interface Assistant {
         String chat(String userMessage);
@@ -51,11 +51,11 @@ public class RAGController {
     @GetMapping(value = "/embed/memory", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> embedMemory() {
         try {
-            TextSegment segment1 = TextSegment.from("I like football.");
+            TextSegment segment1 = TextSegment.from("我喜欢打乒乓球");
             Embedding embedding1 = ollamaEmbeddingModel.embed(segment1).content();
             embeddingStore.add(embedding1, segment1);
 
-            TextSegment segment2 = TextSegment.from("The weather is good today.");
+            TextSegment segment2 = TextSegment.from("张三是个程序员");
             Embedding embedding2 = ollamaEmbeddingModel.embed(segment2).content();
             embeddingStore.add(embedding2, segment2);
 
@@ -70,7 +70,7 @@ public class RAGController {
     public ResponseEntity<String> queryInMemory(@RequestParam(required = false) String query) {
         try {
             if (!StringUtils.hasText(query)) {
-                query = "What is your favourite sport?";
+                query = "我最喜欢的运动是什么?";
             }
 
             Embedding queryEmbedding = ollamaEmbeddingModel.embed(query).content();
@@ -87,6 +87,7 @@ public class RAGController {
         }
     }
 
+
     /**
      * 基于RAG的AI聊天
      *
@@ -97,7 +98,7 @@ public class RAGController {
     public ResponseEntity<String> bot(@RequestParam(required = false) String query) {
         try {
             if (!StringUtils.hasText(query)) {
-                query = "What is your favourite sport?";
+                query = "张三的职业是什么？";
             }
 
             ContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
